@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jellyfin France – guides, générateur docker-compose et plugins</title>
+<meta name="description" content="Guides en français, générateur de docker-compose et sélection de plugins pour Jellyfin.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root{--bg:#0c1118;--panel:#131a24;--line:#222c3a;--txt:#e9edf4;--mut:#a3aebf;--blue:#00a4dc;--vio:#aa5cc3;--vio2:#cf9ae6;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--txt);font:400 16px/1.65 Inter,system-ui,sans-serif}
+a{color:var(--blue)}a:hover{color:#fff}
+:focus-visible{outline:2px solid var(--blue);outline-offset:3px;border-radius:4px}
+.w{max-width:1080px;margin:0 auto;padding:0 24px}
+h1,h2,h3{font-family:"Bricolage Grotesque",sans-serif;line-height:1.1;margin:0;color:#fff}
+h2{font-size:34px;margin-bottom:12px}
+.lead{color:var(--mut);max-width:60ch;margin:0 0 32px}
+nav{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;justify-content:space-between;padding:22px 0}
+nav b{font:800 22px "Bricolage Grotesque",sans-serif;color:#fff}nav b i{font-style:normal;color:var(--blue)}
+nav div{display:flex;gap:22px;flex-wrap:wrap}nav a{color:var(--mut);text-decoration:none;font-weight:500;font-size:15px}nav a:hover{color:#fff}
+.hero{padding:72px 0 64px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.hero h1{font-size:clamp(38px,6vw,64px);font-weight:800;margin-bottom:20px}
+.hero p{color:var(--mut);font-size:18px;max-width:46ch;margin:0 0 28px}
+.btn{display:inline-block;padding:13px 24px;border-radius:8px;font-weight:600;text-decoration:none;border:0;cursor:pointer;font-size:15px;font-family:inherit}
+.b1{background:var(--blue);color:#04141c}.b1:hover{background:#38bdea;color:#04141c}
+.b2{border:1px solid #33425a;color:var(--txt);background:none}.b2:hover{border-color:var(--blue)}
+.term{background:#080c12;border:1px solid var(--line);border-radius:12px;font:13px/1.6 ui-monospace,Menlo,Consolas,monospace;color:#b9c6d8;padding:18px 20px;overflow:auto;white-space:pre;margin:0}
+section{padding:64px 0;border-top:1px solid var(--line)}
+.rows>div{display:grid;grid-template-columns:200px 1fr;gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--line)}
+.rows h3{font-size:19px}.rows p{margin:0;color:var(--mut)}
+details{border-bottom:1px solid var(--line);padding:16px 0}
+summary{cursor:pointer;font-weight:600;font-size:17px;color:#fff}
+details p,details ul{color:var(--mut);margin:10px 0 0;max-width:70ch}
+.gen{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+fieldset{border:0;padding:0;margin:0 0 18px}legend{font-weight:600;padding:0;margin-bottom:8px;color:#fff}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:6px 0;font-size:15px}.chk input{margin-top:5px;accent-color:var(--blue)}.chk small{display:block;color:var(--mut);font-size:13px;line-height:1.4}
+label.f{display:block;font-size:14px;color:var(--mut);margin-bottom:12px}
+input[type=text],select{width:100%;margin-top:4px;background:#0a0f16;border:1px solid #2c3a4e;border-radius:8px;color:var(--txt);padding:9px 11px;font:inherit;font-size:14px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+#out{max-height:560px;min-height:260px}
+.note{font-size:13px;color:var(--mut);margin-top:12px}
+.tag{display:inline-block;font-size:12px;font-weight:600;padding:2px 9px;border-radius:99px;margin-left:8px;vertical-align:middle}
+.t1{background:#0a3446;color:#7fd6f5}.t2{background:#33203d;color:var(--vio2)}.t3{background:#3a2f12;color:#f0cf7a}
+.cd{margin:12px 0}code{font-size:.92em}
+.ck h3{font-size:20px;margin:30px 0 6px}.ck .chk{max-width:78ch;color:var(--mut)}.ck .chk input{flex:none}
+.tips{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--vio);border-radius:10px;padding:18px 22px;margin-bottom:12px}
+.tips ul{margin:8px 0 0;padding-left:20px;color:var(--mut)}
+.cta{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:40px;display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between}
+footer{border-top:1px solid var(--line);padding:28px 0 44px;color:var(--mut);font-size:14px}
+@media(max-width:820px){.hero,.gen{grid-template-columns:1fr}.rows>div{grid-template-columns:1fr}.hero{padding-top:40px}.cta{padding:26px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="w">
+<nav aria-label="Navigation principale"><b>Jellyfin<i> France</i></b>
+<div><a href="#guides">Guides</a><a href="#clients">Clients</a><a href="#proxy">Reverse proxy</a><a href="#generateur">Générateur</a><a href="#apres">Après l’installation</a><a href="#plugins">Plugins</a><a href="#faq">FAQ</a><a href="#groupe">Groupe</a></div></nav>
+<header class="hero">
+<div><h1>Jellyfin, expliqué en français.</h1>
+<p>Installe ton serveur multimédia, génère ton fichier docker-compose en quelques clics et choisis les bons plugins.</p>
+<a class="btn b1" href="#generateur">Générer mon docker-compose</a> <a class="btn b2" href="#guides">Lire les guides</a></div>
+<pre class="term" aria-hidden="true">services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    volumes:
+      - ./config/jellyfin:/config
+      - /mnt/media:/media</pre>
+</header>
+
+<section id="guides"><h2>Guides pour bien démarrer</h2>
+<p class="lead">Les bases, dans l’ordre où tu en as besoin.</p>
+<div class="rows">
+<div><h3>Installer Jellyfin</h3><p>Le plus simple sur Linux ou NAS : Docker avec le générateur ci-dessous. Sur Windows ou macOS, installe l’application serveur depuis le site officiel. Ouvre ensuite <code>http://IP-du-serveur:8096</code> et suis l’assistant : compte administrateur, langue, dossiers de médias.</p></div>
+<div><h3>Organiser ses médias</h3><p>Un dossier par type (films, séries, musique), puis un dossier par titre, par exemple <code>Films/Titre (2020)/Titre (2020).mkv</code>. Respecter les noms recommandés par Jellyfin évite la plupart des erreurs de reconnaissance et d’affiches.</p></div>
+<div><h3>Regarder sur tous ses écrans</h3><p>Navigateur web, application Android TV, Fire TV, Swiftfin sur iPhone et Apple TV, Findroid sur Android. Le client qui lit directement ton format évite le transcodage, donc moins de charge sur le serveur.</p></div>
+<div><h3>Accès à distance</h3><p>Le plus sûr est un VPN maillé comme Tailscale : aucun port à ouvrir sur la box. Si tu exposes Jellyfin sur Internet, utilise un reverse proxy avec HTTPS (Caddy, Nginx Proxy Manager), des mots de passe solides et des comptes sans droits d’administrateur. Le <a href="#proxy">guide reverse proxy</a> explique la mise en place.</p></div>
+<div><h3>Sauvegarder</h3><p>Sauvegarde le dossier de configuration (utilisateurs, métadonnées, historique), pas seulement les médias. Fais une copie avant chaque mise à jour du serveur.</p></div>
+</div></section>
+
+<section id="clients"><h2>Quel client pour quel appareil ?</h2>
+<p class="lead">Le bon client évite le transcodage et donne une lecture plus fluide. Les disponibilités changent : vérifie sur le magasin d’applications de ton appareil.</p>
+<div class="rows">
+<div><h3>Navigateur web</h3><p>Aucune installation, sur tous les appareils. Pratique pour tester, mais certains formats sont transcodés. Le Chromecast fonctionne depuis le navigateur Chrome.</p></div>
+<div><h3>Android TV et Google TV</h3><p><b>Jellyfin pour Android TV</b> <span class="tag t1">Officiel</span> est le meilleur choix sur les téléviseurs et boîtiers Android. Une clé Google TV reste une valeur sûre pour un vieux téléviseur.</p></div>
+<div><h3>Fire TV</h3><p><b>Jellyfin</b> <span class="tag t1">Officiel</span> est disponible sur l’Amazon Appstore.</p></div>
+<div><h3>Smartphone et tablette Android</h3><p><b>Jellyfin pour Android</b> <span class="tag t1">Officiel</span>, ou <b>Findroid</b> <span class="tag t2">Communautaire</span> qui permet aussi le téléchargement hors ligne. <b>Streamyfin</b> <span class="tag t2">Communautaire</span> existe aussi.</p></div>
+<div><h3>iPhone, iPad et Apple TV</h3><p><b>Swiftfin</b> <span class="tag t1">Officiel</span>, gratuit. <b>Infuse</b> <span class="tag t3">Payant</span> est un lecteur très complet qui se connecte à Jellyfin, souvent apprécié pour les formats difficiles.</p></div>
+<div><h3>Samsung et LG</h3><p>Des applications existent, mais leur installation et leur disponibilité varient selon le modèle et l’année du téléviseur. Si ça pose problème, branche une clé Google TV, un Fire TV ou une Apple TV.</p></div>
+<div><h3>Windows, macOS et Linux</h3><p><b>Jellyfin Desktop</b> (anciennement Jellyfin Media Player) <span class="tag t1">Officiel</span> lit presque tous les formats sans transcodage.</p></div>
+<div><h3>Musique</h3><p><b>Finamp</b> <span class="tag t2">Communautaire</span> sur mobile, ou <b>Symfonium</b> <span class="tag t3">Payant</span> sur Android, qui gère Jellyfin et Navidrome.</p></div>
+</div></section>
+
+<section id="proxy"><h2>Reverse proxy : Jellyfin en HTTPS</h2>
+<p class="lead">Un reverse proxy reçoit les connexions depuis Internet, gère le certificat HTTPS et les transmet à Jellyfin. Ce guide utilise Caddy : il obtient et renouvelle les certificats tout seul, sur Linux comme sur Windows.</p>
+<div class="tips"><b style="color:#fff">Avant de commencer</b>
+<ul><li>Il te faut un nom de domaine, ou un sous-domaine gratuit (DuckDNS), qui pointe vers l’adresse IP publique de ta box.</li>
+<li>Sur la box, redirige les ports 80 et 443 vers la machine qui fait tourner Caddy. Ne redirige pas le port 8096.</li>
+<li>Si ton opérateur ne te donne pas d’IP publique propre (CGNAT), cette méthode ne marche pas : utilise un VPN comme Tailscale ou un tunnel Cloudflare.</li></ul></div>
+<h3 style="margin:28px 0 8px;font-size:21px">Le fichier de configuration</h3>
+<p class="lead" style="margin-bottom:0">Le même contenu sert sur Linux et sur Windows. Remplace le nom par ton domaine.</p>
+<pre class="term cd">jellyfin.exemple.fr {
+    reverse_proxy localhost:8096
+}</pre>
+<p class="note" style="margin-top:0">Si Caddy tourne dans Docker, remplace <code>localhost</code> par le nom du conteneur Jellyfin (par exemple <code>jellyfin</code>) et mets les deux dans le même réseau Docker.</p>
+<details open><summary>Sur Linux</summary>
+<ul><li>Installe Caddy en suivant la page officielle d’installation (caddyserver.com/docs/install) pour ta distribution.</li>
+<li>Ouvre le fichier avec <code>sudo nano /etc/caddy/Caddyfile</code> et colle la configuration.</li>
+<li>Recharge : <code>sudo systemctl reload caddy</code>.</li>
+<li>Si tu utilises ufw : <code>sudo ufw allow 80,443/tcp</code>.</li>
+<li>En cas d’erreur : <code>sudo journalctl -u caddy --no-pager | tail -n 30</code>.</li></ul></details>
+<details><summary>Sur Windows</summary>
+<ul><li>Dans PowerShell : <code>winget install CaddyServer.Caddy</code>, ou télécharge Caddy sur caddyserver.com.</li>
+<li>Crée un dossier, par exemple <code>C:\caddy</code>, avec un fichier nommé <code>Caddyfile</code> (sans extension) contenant la configuration.</li>
+<li>Ouvre PowerShell dans ce dossier et lance <code>caddy start</code>. Pour le tester au premier plan : <code>caddy run</code>.</li>
+<li>Ouvre le pare-feu (PowerShell en administrateur) : <code>New-NetFirewallRule -DisplayName "Caddy" -Direction Inbound -Protocol TCP -LocalPort 80,443 -Action Allow</code>.</li>
+<li>Pour qu’il démarre avec Windows, crée une tâche planifiée « au démarrage » qui lance <code>caddy start</code>. Si le port 80 est déjà pris (IIS, autre serveur), libère-le d’abord.</li></ul></details>
+<h3 style="margin:28px 0 8px;font-size:21px">Côté Jellyfin</h3>
+<ul style="color:var(--mut);max-width:70ch"><li>Dans Tableau de bord, Réseau, laisse « URL de base » vide.</li>
+<li>Ajoute l’adresse du proxy dans « Proxys connus » (127.0.0.1 si Caddy est sur la même machine) pour que Jellyfin voie les vraies adresses des visiteurs.</li>
+<li>Teste en ouvrant <code>https://jellyfin.exemple.fr</code> depuis la 4G, pas depuis ton Wi-Fi.</li></ul>
+<div class="tips" style="margin-top:20px"><b style="color:#fff">Sécurité</b>
+<ul><li>N’expose que les ports 80 et 443, jamais Sonarr, Radarr ou les autres services.</li>
+<li>Mots de passe solides, et comptes sans droits d’administrateur pour les proches.</li>
+<li>Garde Jellyfin et Caddy à jour.</li>
+<li>Tu préfères une interface graphique ? Nginx Proxy Manager, sous Docker, propose des boutons pour les certificats.</li></ul></div>
+</section>
+
+<section id="generateur"><h2>Générateur de docker-compose</h2>
+<p class="lead">Coche tes services, indique tes dossiers : le fichier se met à jour tout seul. Tout se passe dans ton navigateur, rien n’est envoyé.</p>
+<form class="gen" id="gf" onsubmit="return false">
+<div class="panel">
+<fieldset><legend>Services</legend><div id="svc"></div></fieldset>
+<fieldset><legend>Réglages</legend>
+<label class="f">Système<select id="os"><option value="linux">Linux ou NAS</option><option value="win">Windows (Docker Desktop)</option></select></label>
+<label class="f">Dossier de tes médias (vu comme /media)<input type="text" id="media" value="/mnt/media"></label>
+<label class="f">Dossier des configurations<input type="text" id="cfg" value="./config"></label>
+<div class="two"><label class="f">UID (PUID)<input type="text" id="puid" value="1000" inputmode="numeric"></label><label class="f">GID (PGID)<input type="text" id="pgid" value="1000" inputmode="numeric"></label></div>
+<label class="f">Fuseau horaire<select id="tz"><option>Europe/Paris</option><option>Europe/Brussels</option><option>Europe/Zurich</option><option>America/Montreal</option><option>America/Martinique</option><option>Indian/Reunion</option><option>UTC</option></select></label>
+<label class="chk"><input type="checkbox" id="hw"><span>Accélération matérielle Intel pour Jellyfin<small>Ajoute /dev/dri (processeur Intel avec carte graphique intégrée)</small></span></label>
+</fieldset></div>
+<div>
+<div class="bar"><button class="btn b1" type="button" id="cp">Copier</button><button class="btn b2" type="button" id="dl">Télécharger docker-compose.yml</button></div>
+<pre class="term" id="out" tabindex="0" aria-live="polite"></pre>
+<p class="note">Lance ensuite <code>docker compose up -d</code> dans le dossier du fichier. Crée d’abord les dossiers de configuration et vérifie les noms d’images sur la documentation de chaque projet : ils évoluent. Prévois dans ton dossier de médias les sous-dossiers <code>films</code>, <code>series</code>, <code>musique</code> et <code>livres-audio</code> selon les services choisis. Les mots de passe et clés (Jellystat, Homarr) sont tirés au hasard à chaque chargement de la page : garde le fichier généré.</p>
+<p class="note"><b style="color:#fff">Sous Windows</b>, Docker Desktop est nécessaire. Jellyfin, Sonarr, Radarr et Prowlarr ont aussi un installateur Windows natif, qui peut être plus fiable : sur des dossiers Windows partagés avec Docker, des erreurs de base de données verrouillée sont possibles pour Sonarr et Radarr.</p>
+</div></form></section>
+
+<section id="apres"><h2>Après l’installation : la liste de contrôle</h2>
+<p class="lead">Les services tournent, il reste à les relier. Compte une à deux heures. Tes cases cochées sont mémorisées dans ce navigateur.</p>
+<div class="tips"><b style="color:#fff">Bon à savoir</b>
+<ul><li>Remplace <code>IP</code> par l’adresse de ta machine, par exemple <code>http://192.168.1.20:8096</code>.</li>
+<li>Entre les services d’un même fichier compose, utilise le nom du conteneur : <code>http://jellyfin:8096</code>, <code>http://sonarr:8989</code>, <code>http://radarr:7878</code>.</li>
+<li>Les clés d’API se trouvent dans Réglages, Général de Sonarr, Radarr et Prowlarr, et dans Tableau de bord, Clés d’API de Jellyfin. Les menus peuvent varier selon les versions.</li></ul></div>
+<div class="ck">
+<h3>Jellyfin (port 8096)</h3>
+<label class="chk"><input type="checkbox"><span>Suis l’assistant : compte administrateur, langue française</span></label>
+<label class="chk"><input type="checkbox"><span>Crée les bibliothèques : <code>/media/films</code>, <code>/media/series</code>, <code>/media/musique</code></span></label>
+<label class="chk"><input type="checkbox"><span>Crée un compte par personne, sans droits d’administrateur</span></label>
+<h3>Sonarr (8989) et Radarr (7878)</h3>
+<label class="chk"><input type="checkbox"><span>Active l’authentification quand l’application le demande</span></label>
+<label class="chk"><input type="checkbox"><span>Dans la gestion des médias, ajoute le dossier racine : <code>/media/series</code> pour Sonarr, <code>/media/films</code> pour Radarr</span></label>
+<label class="chk"><input type="checkbox"><span>Choisis ton profil de qualité et la langue voulue</span></label>
+<label class="chk"><input type="checkbox"><span>Ajoute ton client de téléchargement dans Réglages, Clients de téléchargement</span></label>
+<h3>Prowlarr (9696)</h3>
+<label class="chk"><input type="checkbox"><span>Ajoute tes indexeurs</span></label>
+<label class="chk"><input type="checkbox"><span>Dans Réglages, Applications, ajoute Sonarr et Radarr avec leurs adresses et clés d’API : Prowlarr leur envoie alors tes indexeurs</span></label>
+<h3>Jellyseerr (5055)</h3>
+<label class="chk"><input type="checkbox"><span>Choisis Jellyfin comme serveur : adresse <code>http://jellyfin:8096</code> et ton compte administrateur</span></label>
+<label class="chk"><input type="checkbox"><span>Synchronise les bibliothèques</span></label>
+<label class="chk"><input type="checkbox"><span>Ajoute Radarr et Sonarr (adresse, clé d’API, dossier racine, profil de qualité)</span></label>
+<h3>Jellystat (3000)</h3>
+<label class="chk"><input type="checkbox"><span>Crée le compte, puis renseigne l’adresse de Jellyfin et une clé d’API créée dans Jellyfin</span></label>
+<h3>Navidrome (4533), Audiobookshelf (13378), Homarr (7575), Uptime Kuma (3001)</h3>
+<label class="chk"><input type="checkbox"><span>Navidrome et Audiobookshelf : crée le premier compte, qui devient administrateur, puis lance un scan de tes dossiers</span></label>
+<label class="chk"><input type="checkbox"><span>Homarr : ajoute tes services comme applications du tableau de bord</span></label>
+<label class="chk"><input type="checkbox"><span>Uptime Kuma : crée un moniteur par service</span></label>
+<h3>Pour finir</h3>
+<label class="chk"><input type="checkbox"><span>Sauvegarde le dossier de configuration</span></label>
+<label class="chk"><input type="checkbox"><span>Ne mets que Jellyfin sur Internet, en HTTPS (voir le guide reverse proxy)</span></label>
+</div></section>
+
+<section id="plugins"><h2>Plugins : lesquels installer ?</h2>
+<p class="lead">Le catalogue se trouve dans Tableau de bord, Plugins. Redémarre le serveur après chaque installation.</p>
+<div class="tips"><b style="color:#fff">Mes conseils</b>
+<ul><li>Commence avec peu de plugins : chacun tourne avec les droits du serveur, donc ne mets que ceux dont tu as besoin.</li>
+<li>Préfère le catalogue officiel. Les plugins communautaires demandent d’ajouter un dépôt : vérifie la date de dernière mise à jour et les avis.</li>
+<li>Un plugin dépend de la version du serveur. Avant de mettre Jellyfin à jour, sauvegarde, puis vérifie la compatibilité.</li></ul></div>
+<div class="rows">
+<div><h3>Open Subtitles <span class="tag t1">Officiel</span></h3><p>Télécharge automatiquement les sous-titres manquants, y compris en français. Il faut un compte gratuit sur le service.</p></div>
+<div><h3>Playback Reporting <span class="tag t1">Officiel</span></h3><p>Statistiques de lecture : qui regarde quoi, et quand. Pratique pour savoir ce qui sert vraiment.</p></div>
+<div><h3>TMDb Box Sets <span class="tag t1">Officiel</span></h3><p>Regroupe les films d’une même saga dans une collection.</p></div>
+<div><h3>Trakt <span class="tag t1">Officiel</span></h3><p>Synchronise ton historique de visionnage avec ton compte Trakt.</p></div>
+<div><h3>Intro Skipper <span class="tag t2">Communautaire</span></h3><p>Détecte les génériques de début et ajoute un bouton « passer l’intro ». Vient d’un dépôt tiers : lis sa documentation avant d’installer.</p></div>
+<div><h3>Thèmes CSS <span class="tag t2">Communautaire</span></h3><p>Ce n’est pas un plugin : colle un thème (ElegantFin, Ultrachromic) dans Tableau de bord, Général, CSS personnalisé, pour changer l’apparence.</p></div>
+</div></section>
+
+<section id="faq"><h2>Questions fréquentes</h2>
+<details><summary>Je n’ai pas de son, ou le son est décalé</summary><p>Souvent un codec audio que le client ne sait pas lire (DTS, TrueHD). Jellyfin le transcode alors, ce qui demande de la puissance. Essaie un autre client, ou choisis une piste audio compatible (AAC, AC3).</p></details>
+<details><summary>La lecture saccade ou charge sans fin</summary><p>Regarde dans le tableau de bord si la lecture est transcodée. Si oui, baisse la qualité, change de client ou active l’accélération matérielle. Vérifie aussi le débit du Wi-Fi.</p></details>
+<details><summary>Les sous-titres ne s’affichent pas</summary><p>Les sous-titres image (PGS) forcent souvent le transcodage. Préfère le format SRT ou ASS, ou installe le plugin Open Subtitles.</p></details>
+<details><summary>Une affiche ou un titre est faux</summary><p>Vérifie le nom du dossier et du fichier, puis utilise « Identifier » sur la fiche du média pour choisir le bon résultat.</p></details>
+<details><summary>Comment mettre Jellyfin à jour avec Docker ?</summary><p>Sauvegarde ta configuration, puis lance <code>docker compose pull</code> et <code>docker compose up -d</code>.</p></details>
+</section>
+
+<section id="groupe"><div class="cta"><div><h2>Une question ? Le groupe répond.</h2><p class="lead" style="margin:0">Rejoins la communauté Jellyfin France sur Facebook.</p></div><a class="btn b1" href="https://www.facebook.com/share/g/1CdJtGDhcq/" rel="noopener">Ouvrir le groupe Facebook</a></div></section>
+</div>
+<footer><div class="w">© 2026 Jellyfin France. Site communautaire, non affilié au projet Jellyfin. Vérifie toujours les configurations avant de les utiliser.</div></footer>
+
+<script>
+const KEY=[...crypto.getRandomValues(new Uint8Array(32))].map(b=>b.toString(16).padStart(2,"0")).join("");
+const rnd=n=>[...crypto.getRandomValues(new Uint8Array(n))].map(b=>b.toString(16).padStart(2,"0")).join("");
+const PW=rnd(12),JWT=rnd(24);
+const SV=[
+{id:"jellyfin",n:"Jellyfin",d:"Serveur multimédia : films, séries, musique",on:1},
+{id:"jellyseerr",n:"Jellyseerr",d:"Les utilisateurs demandent du contenu",on:0},
+{id:"navidrome",n:"Navidrome",d:"Serveur de musique compatible Subsonic",on:0},
+{id:"abs",n:"Audiobookshelf",d:"Livres audio et podcasts",on:0},
+{id:"homarr",n:"Homarr",d:"Tableau de bord de tes services",on:0},
+{id:"kuma",n:"Uptime Kuma",d:"Surveille si tes services répondent",on:0},
+{id:"sonarr",n:"Sonarr",d:"Gère ta bibliothèque de séries",on:0},
+{id:"radarr",n:"Radarr",d:"Gère ta bibliothèque de films",on:0},
+{id:"prowlarr",n:"Prowlarr",d:"Centralise les indexeurs de Sonarr et Radarr",on:0},
+{id:"jellystat",n:"Jellystat",d:"Statistiques détaillées de lecture (ajoute une base PostgreSQL)",on:0},
+{id:"recyclarr",n:"Recyclarr",d:"Applique les profils de qualité et de langue à Sonarr et Radarr",on:0}];
+const B={
+jellyfin:f=>`  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin${f.win?"":`
+    user: "${f.u}:${f.g}"`}
+    restart: unless-stopped
+    ports:
+      - "8096:8096"
+    environment:
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/jellyfin/config:/config"
+      - "${f.c}/jellyfin/cache:/cache"
+      - "${f.m}:/media"${f.hw&&!f.win?`
+    devices:
+      - /dev/dri:/dev/dri
+    # Accélération Intel : ajoute group_add avec l’ID du groupe render
+    # (commande : getent group render)`:""}`,
+jellyseerr:f=>`  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    restart: unless-stopped
+    ports:
+      - "5055:5055"
+    environment:
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/jellyseerr:/app/config"`,
+navidrome:f=>`  navidrome:
+    image: deluan/navidrome:latest
+    container_name: navidrome${f.win?"":`
+    user: "${f.u}:${f.g}"`}
+    restart: unless-stopped
+    ports:
+      - "4533:4533"
+    environment:
+      - ND_SCANSCHEDULE=1h
+    volumes:
+      - "${f.c}/navidrome:/data"
+      - "${f.m}/musique:/music:ro"`,
+abs:f=>`  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    container_name: audiobookshelf
+    restart: unless-stopped
+    ports:
+      - "13378:80"
+    environment:
+      - TZ=${f.tz}
+    volumes:
+      - "${f.m}/livres-audio:/audiobooks"
+      - "${f.c}/audiobookshelf/config:/config"
+      - "${f.c}/audiobookshelf/metadata:/metadata"`,
+homarr:f=>`  homarr:
+    image: ghcr.io/homarr-labs/homarr:latest
+    container_name: homarr
+    restart: unless-stopped
+    ports:
+      - "7575:7575"
+    environment:
+      - SECRET_ENCRYPTION_KEY=${KEY}
+    volumes:
+      - "${f.c}/homarr:/appdata"`,
+kuma:f=>`  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      - "${f.c}/uptime-kuma:/app/data"`,
+sonarr:f=>`  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    environment:
+      - PUID=${f.u}
+      - PGID=${f.g}
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/sonarr:/config"
+      - "${f.m}:/media"`,
+radarr:f=>`  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    ports:
+      - "7878:7878"
+    environment:
+      - PUID=${f.u}
+      - PGID=${f.g}
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/radarr:/config"
+      - "${f.m}:/media"`,
+prowlarr:f=>`  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    ports:
+      - "9696:9696"
+    environment:
+      - PUID=${f.u}
+      - PGID=${f.g}
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/prowlarr:/config"`,
+jellystat:f=>`  jellystat-db:
+    image: postgres:15-alpine
+    container_name: jellystat-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=jellystat
+      - POSTGRES_PASSWORD=${PW}
+    volumes:
+      - "${f.c}/jellystat/db:/var/lib/postgresql/data"
+
+  jellystat:
+    image: cyfershepard/jellystat:latest
+    container_name: jellystat
+    restart: unless-stopped
+    depends_on:
+      - jellystat-db
+    ports:
+      - "3000:3000"
+    environment:
+      - POSTGRES_USER=jellystat
+      - POSTGRES_PASSWORD=${PW}
+      - POSTGRES_IP=jellystat-db
+      - POSTGRES_PORT=5432
+      - JWT_SECRET=${JWT}
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/jellystat/backup:/app/backend/backup-data"`,
+recyclarr:f=>`  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr:9
+    container_name: recyclarr${f.win?"":`
+    user: "${f.u}:${f.g}"`}
+    restart: unless-stopped
+    environment:
+      - TZ=${f.tz}
+    volumes:
+      - "${f.c}/recyclarr:/config"`};
+const q=i=>document.getElementById(i);
+q("svc").innerHTML=SV.map(s=>`<label class="chk"><input type="checkbox" value="${s.id}"${s.on?" checked":""}><span>${s.n}<small>${s.d}</small></span></label>`).join("");
+function gen(){
+const cl=v=>v.replace(/["\r\n]/g,"").trim().replace(/\/+$/,"")||".";
+const num=v=>v.replace(/\D/g,"")||"1000";
+const f={tz:q("tz").value,u:num(q("puid").value),g:num(q("pgid").value),m:cl(q("media").value),c:cl(q("cfg").value),hw:q("hw").checked,win:q("os").value==="win"};
+const on=[...document.querySelectorAll("#svc input:checked")].map(i=>i.value);
+q("out").textContent=on.length?(f.win?"# Windows (Docker Desktop) : écris les chemins avec des / (ex. C:/Media).\n":"")+"services:\n"+on.map(i=>B[i](f)).join("\n\n")+"\n":"# Coche au moins un service.\n";}
+q("gf").addEventListener("input",gen);
+q("os").addEventListener("change",()=>{const w=q("os").value==="win";
+if(w&&q("media").value==="/mnt/media")q("media").value="C:/Media";
+if(!w&&q("media").value==="C:/Media")q("media").value="/mnt/media";
+if(w)q("hw").checked=false;
+q("hw").disabled=w;q("puid").disabled=w;q("pgid").disabled=w;gen();});
+gen();
+q("cp").onclick=async()=>{try{await navigator.clipboard.writeText(q("out").textContent);q("cp").textContent="Copié"}catch(e){const r=document.createRange();r.selectNodeContents(q("out"));const s=getSelection();s.removeAllRanges();s.addRange(r);q("cp").textContent="Sélectionné : copie avec Ctrl+C"}setTimeout(()=>q("cp").textContent="Copier",2000)};
+q("dl").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([q("out").textContent],{type:"text/yaml"}));a.download="docker-compose.yml";a.click();URL.revokeObjectURL(a.href)};
+(()=>{const bx=[...document.querySelectorAll(".ck input")];let s={};try{s=JSON.parse(localStorage.getItem("ck")||"{}")}catch(e){}
+bx.forEach((b,i)=>{b.checked=!!s[i];b.addEventListener("change",()=>{s[i]=b.checked;try{localStorage.setItem("ck",JSON.stringify(s))}catch(e){}})});})();
+</script>
+</body>
+</html>
